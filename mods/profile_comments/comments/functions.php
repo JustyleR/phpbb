@@ -1,5 +1,6 @@
 <?php
 
+// Get the username of the user by his ID
 function get_username_byID($conn, $db_prefix, $id) {
 	
 	if(is_numeric($id)) {
@@ -15,6 +16,7 @@ function get_username_byID($conn, $db_prefix, $id) {
 	
 }
 
+// Get the ID of the user by his username
 function get_id_byUsername($conn, $db_prefix, $username) {
 	
 	$get = mysqli_query($conn, "SELECT user_id FROM ". $db_prefix ."users WHERE username='". $username ."'");

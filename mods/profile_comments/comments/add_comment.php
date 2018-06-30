@@ -1,5 +1,7 @@
 <?php
 
+// Add comments
+
 if(isset($_GET['id'])) {
 	
 	if(is_numeric($_GET['id'])) {
@@ -13,9 +15,7 @@ if(isset($_GET['id'])) {
 		define('ROOT_PATH', "../");
 
 		if (!defined('IN_PHPBB') || !defined('ROOT_PATH')) {
-			
 			exit();
-			
 		}
 
 		$phpEx = "php";
@@ -25,15 +25,12 @@ if(isset($_GET['id'])) {
 
 		$user->session_begin();
 
-		if ($user->data['user_id'] == ANONYMOUS) {
-			
-		   header('Location: ../');
-		   
-		} else {
+		if ($user->data['user_id'] == ANONYMOUS) { header('Location: ../'); } else {
 			
 			$authorID = get_id_byUsername($conn, $table_prefix, $user->data['username']);
 			
 			echo '
+			<a href="profile.php?u='. $id .'">Go Back</a>
 			<form action="" method="POST">
 				<textarea style="resize: none;" name="comment" rows="7" cols="32"></textarea><br />
 				<input type="submit" name="add" value="Add" />
@@ -51,6 +48,7 @@ if(isset($_GET['id'])) {
 					
 				} else {
 					
+					// Check if the user exsists and then post the comment
 					$checkUser = mysqli_query($conn, "SELECT user_id FROM ". $table_prefix ."users WHERE user_id='". $id ."'");
 					if(mysqli_num_rows($checkUser) > 0) {
 						

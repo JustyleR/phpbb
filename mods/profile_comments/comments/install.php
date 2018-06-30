@@ -1,5 +1,7 @@
 <?php
 
+// The Install script
+
 echo '
 <form action="" method="POST">
 	<input type="text" name="uninstall_key" placeholder="Uninstall Key" /><br />
@@ -25,13 +27,16 @@ if(isset($_POST['install'])) {
 	
 	if(file_exists('config.php')) {
 		
+		// Open the config file and replace the empty space with the key
 		$content = file_get_contents('config.php');
 		$content = str_replace('$uninstall_key = "";', '$uninstall_key = "'. $uninstall .'";', $content);
 		file_put_contents('config.php', $content);
 		
+		// Get the currect style that is active
 		$getStyle = mysqli_query($conn, "SELECT style_path FROM ". $table_prefix ."styles WHERE style_active='1'");
 		if(mysqli_num_rows($getStyle) > 0) {
 			
+			// Open the memberlist_view.html and add the link
 			$style		= mysqli_fetch_assoc($getStyle)['style_path'];
 			$content	= file_get_contents('../styles/'. $style .'/template/memberlist_view.html');
 			$content	= str_replace(
@@ -41,10 +46,6 @@ if(isset($_POST['install'])) {
 			$content);
 			file_put_contents('../styles/'. $style .'/template/memberlist_view.html', $content);
 		}
-		
-		$content = file_get_contents('config.php');
-		$content = str_replace('$uninstall_key = "";', '$uninstall_key = "'. $uninstall .'";', $content);
-		file_put_contents('config.php', $content);
 		
 	} else {
 		
