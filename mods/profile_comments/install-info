@@ -1,0 +1,9 @@
+By phpbb I mean the core phpbb directory.
+
+Extract the comments folder in the phpbb directory.
+Open in the url phpbb/comments/install.php and type the key that will be used to uninstall the mod (password).
+After that the script will modify the current template and add a link to the profile page.
+Now go to the Admin Panel and clear the cache.
+Thats all, if you want to delete the script open phpbb/comments/uninstall.php and enter the key which you used while installing the mod.
+
+Don't forget to delete the install.php file!
