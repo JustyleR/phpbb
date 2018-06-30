@@ -25,13 +25,6 @@ if(isset($_GET['cid'])) {
 		$user->session_begin();
 		$auth->acl($user->data);
 		
-		// Check if the user is an admin/moderator or it is the user's profile or its the user's own comment, if so the show the delete link
-		if($auth->acl_getf_global('m_') || $auth->acl_getf_global('a_') || $row['author_id'] == $user->data['user_id'] || $id == $user->data['user_id']) {
-		   
-		   echo ' - <a href="delete.php?cid='. $row['comment_id'] .'">Delete</a>';
-		
-		} 
-		
 		// Check the comment
 		$checkComment = mysqli_query($conn, "SELECT * FROM profile_comments WHERE comment_id='". $cid ."'");
 		if(mysqli_num_rows($checkComment) > 0) {
