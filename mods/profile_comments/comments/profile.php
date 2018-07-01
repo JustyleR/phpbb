@@ -7,7 +7,7 @@ require('functions.php');
 
 if(isset($_GET['u'])) {
 	
-	$user = $_GET['u'];
+	$user = (int)$_GET['u'];
 	// Check if the user is called by id or username
 	if(is_numeric($user)) { $user_type = 'num'; } else { $user_type = 'string'; }
 	
@@ -41,15 +41,33 @@ if(isset($_GET['u'])) {
 			// Start session management
 			$user->session_begin();
 			$auth->acl($user->data);
+			$request->enable_super_globals();
 			
-			while($row = mysqli_fetch_assoc($getComments)) {
+			$link = 'http://'. $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . '';
+			
+			if(!isset($_GET['cPage'])) { header('Location: '. $link .'&cPage=1'); }
+			
+			$page = $_GET['cPage'];
+			
+			if(!is_numeric($page) || $page == 0) { $page = 1; }
+			
+			$total			= mysqli_num_rows($getComments);
+			$total_pages	= ceil($total / $comments_per_page);
+			
+			if($page > $total_pages) { $page = 1; }
+			
+			$comments = $page * $comments_per_page - $comments_per_page;
+			
+			$getComments2 = mysqli_query($conn, "SELECT * FROM profile_comments WHERE user_id='". $id ."' ORDER BY comment_id DESC LIMIT ". $comments .", ". $comments_per_page ."");
+			
+			while($row = mysqli_fetch_assoc($getComments2)) {
 				
 				$authorName = get_username_byID($conn, $table_prefix, $row['author_id']); 
 				
 				echo '
 				<div style="background: #e3e3e3;">
 					<div style="background: silver; padding: 0.5%;">
-					<a href="profile.php?u='. $row['author_id'] .'">'. $authorName .'</a>';
+					<a href="profile.php?u='. $row['author_id'] .'">'. $authorName .'</a> ('. $row['date'] .')';
 					
 					// Check if the user is an admin/moderator or it is the user's profile or its the user's own comment, if so then show the delete link
 					if($auth->acl_getf_global('m_') || $auth->acl_getf_global('a_') || $row['author_id'] == $user->data['user_id'] || $id == $user->data['user_id']) {
@@ -64,6 +82,28 @@ if(isset($_GET['u'])) {
 					<p>'. $row['comment'] .'</p></div>
 				</div>
 				';
+				
+			}
+			
+			if($page > 1) {
+				
+				$prev = $page - 1;
+				echo '<a href="profile.php?u='. $id .'&cPage='. $prev .'">Prev</a> - ';
+				
+			} else {
+				
+				echo 'Prev - ';
+				
+			}
+			
+			if($page < $total_pages) {
+				
+				$next = $page + 1;
+				echo '<a href="profile.php?u='. $id .'&cPage='. $next .'">Next</a>';
+				
+			} else {
+				
+				echo 'Next';
 				
 			}
 			

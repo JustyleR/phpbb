@@ -9,7 +9,7 @@ if(isset($_GET['id'])) {
 		require('config.php');
 		require('functions.php');
 		
-		$id = $_GET['id'];
+		$id = (int)$_GET['id'];
 		
 		define('IN_PHPBB', true);
 		define('ROOT_PATH', "../");
@@ -52,10 +52,43 @@ if(isset($_GET['id'])) {
 					$checkUser = mysqli_query($conn, "SELECT user_id FROM ". $table_prefix ."users WHERE user_id='". $id ."'");
 					if(mysqli_num_rows($checkUser) > 0) {
 						
-						mysqli_query($conn, "INSERT INTO profile_comments (user_id, author_id, comment, date) VALUES ('". $id ."','". $authorID ."','". $comment ."','". $date ."')");
+						// Check if the user has already commented within a minute (anti spam)
+						$checkComment = mysqli_query($conn, "SELECT * FROM profile_comments WHERE author_id='". $user->data['user_id'] ."' AND user_id='". $id ."'");
+						if(mysqli_num_rows($checkComment) > 0) {
+							
+							// Check if 1 minute has passed
+							$cDate = mysqli_fetch_assoc($checkComment)['date'];
+							$fDate = strtotime('+1 minute', strtotime($cDate));
+							if(date('d-m-Y H:i', $fDate) < date('d-m-Y H:i')) {
+								
+								$continue = 1;
+								
+							} else {
+								
+								
+								$continue = 0;
+							}
+							
+							
+						} else {
+							
+							$continue = 1;
+							
+						}
 						
-						echo 'Comment added successfully!';
-						header('refresh:1; url=profile.php?u='.$id.'');
+						if($continue == 1) {
+							
+							mysqli_query($conn, "INSERT INTO profile_comments (user_id, author_id, comment, date) VALUES ('". $id ."','". $authorID ."','". $comment ."','". $date ."')");
+						
+							echo 'Comment added successfully!';
+							header('refresh:1; url=profile.php?u='.$id.'');
+							
+						} else {
+							
+							echo 'Slow down!<br />
+							Please wait a while and then post a comment!';
+							
+						}
 						
 					} else {
 						
