@@ -12,6 +12,11 @@ include($phpbb_root_path . 'common.' . $phpEx);
 
 require('config.php');
 require('functions.php');
+
+if(check_table($conn) == false) {
+	die('Table doesnt exists!');
+}
+
 require('../includes/functions_display.php');
 
 // Start session management
@@ -69,7 +74,7 @@ $id	= $profile['user_id'];
 				</div>
 				<div class="comment-block">
 					<form action="" method="POST">
-						<textarea name="comment" id="" cols="30" rows="3" placeholder="Add comment..."></textarea>
+						<textarea maxlength="180" name="comment" id="" cols="30" rows="3" placeholder="Add comment..."></textarea>
 						<input class="btn btn-success btn-sm" type="submit" name="add" value="Add Comment" />
 					</form>
 			';
@@ -81,33 +86,34 @@ $id	= $profile['user_id'];
 				$date		= date('d-m-Y H:i');
 				$authID		= $user->data['user_id'];
 				
-				if(empty($comment)) { echo 'Please, fill the field!'; }
+				if(empty($comment)) { echo 'Please, fill the field!'; } else {
 				
-				// Check if the user has already commented within a minute (anti spam)
-				$checkComment = mysqli_query($conn, "SELECT * FROM profile_comments WHERE author_id='". $authID ."' AND user_id='". $id ."' ORDER BY comment_id DESC");
-				if(mysqli_num_rows($checkComment) > 0) {
+					// Check if the user has already commented within a minute (anti spam)
+					$checkComment = mysqli_query($conn, "SELECT * FROM profile_comments WHERE author_id='". $authID ."' AND user_id='". $id ."' ORDER BY comment_id DESC");
+					if(mysqli_num_rows($checkComment) > 0) {
+						
+						// Check if 1 minute has passed
+						$cDate = mysqli_fetch_assoc($checkComment)['date'];
+						$fDate = strtotime('+1 minute', strtotime($cDate));
+						
+						if(date('d-m-Y H:i', $fDate) < date('d-m-Y H:i')) { $continue = 1;} 
+						
+						else { $continue = 0; }
+						
+					} else { $continue = 1; }
 					
-					// Check if 1 minute has passed
-					$cDate = mysqli_fetch_assoc($checkComment)['date'];
-					$fDate = strtotime('+1 minute', strtotime($cDate));
-					
-					if(date('d-m-Y H:i', $fDate) < date('d-m-Y H:i')) { $continue = 1;} 
-					
-					else { $continue = 0; }
-					
-				} else { $continue = 1; }
+					if($continue == 1) {
+						
+						mysqli_query($conn, "INSERT INTO profile_comments (user_id, author_id, comment, date) VALUES ('". $id ."','". $authID ."','". $comment ."','". $date ."')");
+						
+						header('refresh:0');
+					} else {
+						
+						echo 'Please wait a minute!';
+						
+					}
 				
-				if($continue == 1) {
-					
-					mysqli_query($conn, "INSERT INTO profile_comments (user_id, author_id, comment, date) VALUES ('". $id ."','". $authID ."','". $comment ."','". $date ."')");
-					
-					header('refresh:0');
-				} else {
-					
-					echo 'Please wait a minute!';
-					
 				}
-				
 			}
 			
 			echo '

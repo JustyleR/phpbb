@@ -75,3 +75,37 @@ function user_group($conn, $table_prefix, $user) {
 	} else { return false; }
 	
 }
+
+// Get user color
+function user_color($conn, $table_prefix, $user) {
+	
+	// Check if the user is called by id or username
+	if(is_numeric($user)) { $user_type = 'num'; } else { $user_type = 'string'; }
+	
+	if($user_type == 'num') { $userCheck = mysqli_query($conn, "SELECT * FROM ". $table_prefix ."users WHERE user_id='". $user ."'"); }
+	else if($user_type == 'string') { $userCheck = mysqli_query($conn, "SELECT user_id,username FROM ". $table_prefix ."users WHERE username='". $user ."'"); }
+	
+	if(mysqli_num_rows($userCheck) > 0) {
+		
+		$row = mysqli_fetch_assoc($userCheck);
+		
+		// Get the group
+		$group = mysqli_query($conn, "SELECT group_name,group_colour FROM ". $table_prefix ."groups WHERE group_id='". $row['group_id'] ."'");
+		if(mysqli_num_rows($group) > 0) {
+			
+			$row = mysqli_fetch_assoc($group);
+			
+			return $row['group_colour'];
+			
+		}
+		
+	} else { return false; }
+	
+}
+
+// Check if the mysql table exists
+function check_table($conn) {
+	
+	if(mysqli_query($conn, "DESCRIBE profile_comments")) { return true; } else { return false; }
+	
+}

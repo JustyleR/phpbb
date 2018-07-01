@@ -17,6 +17,12 @@ $request->enable_super_globals();
 echo '
 <form action="" method="POST">
 	<input type="text" name="uninstall_key" placeholder="Uninstall Key" /><br />
+	Show the last comments in the phpbb profile page?<br />
+	<select name="comment">
+		<option value="1">Yes</option>
+		<option value="0">No</option>
+	</select><br />
+	<input type="text" name="max_comments" placeholder="Last comments limit? def: 3" />
 	<input type="submit" name="install" value="Install" />
 </form>
 ';
@@ -42,6 +48,23 @@ if(isset($_POST['install'])) {
 		// Open the config file and replace the empty space with the key
 		$content = file_get_contents('config.php');
 		$content = str_replace('$uninstall_key = "";', '$uninstall_key = "'. $uninstall .'";', $content);
+		
+		if(empty($_POST['max_comments'])) { $mcomments = 3; } else {
+			
+			if(!is_numeric($_POST['max_comments']) || $_POST['max_comments'] == 0 || $_POST['max_comments'] > 10) {
+				
+				$mcomments = 3;
+				
+			} else {
+				
+				$mcomments = $_POST['max_comments'];
+				
+			}
+			
+		}
+		
+		$content .= '
+$last_comments_max	= '. $mcomments .';';
 		file_put_contents('config.php', $content);
 		
 		// Get the currect style that is active
@@ -56,6 +79,31 @@ if(isset($_POST['install'])) {
 			'<!-- IF U_SWITCH_PERMISSIONS --> [ <a href="{U_SWITCH_PERMISSIONS}">{L_USE_PERMISSIONS}</a> ]<!-- ENDIF -->
 			[ <a href="comments/index.php?p=home&u={USERNAME}">View Comments</a> ]',
 			$content);
+			
+			if($_POST['comment'] == 1) {
+				
+				$content	= str_replace(
+			'<!-- EVENT memberlist_view_contact_before -->',
+			'<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<div id="last-comments"></div>
+<script>
+$.urlParam = function(name){
+	var results = new RegExp(\'[\?&]\' + name + \'=([^&#]*)\').exec(window.location.href);
+	if (results==null){
+	   return null;
+	}
+	else{
+	   return decodeURI(results[1]) || 0;
+	}
+}
+var user = $.urlParam(\'u\');
+$("#last-comments").load( "comments/last.php?u=" + user);
+</script>		
+<!-- EVENT memberlist_view_contact_before -->',
+			$content);
+				
+			}
+			
 			file_put_contents('../styles/'. $style .'/template/memberlist_view.html', $content);
 		}
 		

@@ -39,10 +39,22 @@ if(isset($_POST['uninstall'])) {
 			$style		= mysqli_fetch_assoc($getStyle)['style_path'];
 			$content	= file_get_contents('../styles/'. $style .'/template/memberlist_view.html');
 			$content	= str_replace(
-			'<!-- IF U_SWITCH_PERMISSIONS --> [ <a href="{U_SWITCH_PERMISSIONS}">{L_USE_PERMISSIONS}</a> ]<!-- ENDIF -->
-			[ <a href="comments/profile.php?u={USERNAME}">View Comments</a> ]',
-			'<!-- IF U_SWITCH_PERMISSIONS --> [ <a href="{U_SWITCH_PERMISSIONS}">{L_USE_PERMISSIONS}</a> ]<!-- ENDIF -->',
-			$content);
+			'[ <a href="comments/index.php?p=home&u={USERNAME}">View Comments</a> ]', '', $content);
+			$content	= str_replace('<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>','',$content);
+			$content	= str_replace('<div id="last-comments"></div>','',$content);
+			$content	= str_replace('<script>','',$content);
+			$content	= str_replace("$.urlParam = function(name){
+	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	if (results==null){
+	   return null;
+	}
+	else{
+	   return decodeURI(results[1]) || 0;
+	}
+}","",$content);
+			$content	= str_replace("var user = $.urlParam('u');","",$content);
+			$content	= str_replace('$("#last-comments").load( "comments/last.php?u=" + user);','',$content);
+			$content	= str_replace('</script>','',$content);
 			file_put_contents('../styles/'. $style .'/template/memberlist_view.html', $content);
 		}
 		
