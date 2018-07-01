@@ -6,7 +6,7 @@ if(isset($_GET['cid'])) {
 	
 	if(is_numeric($_GET['cid'])) {
 		
-		$cid = $_GET['cid'];
+		$cid = (int)$_GET['cid'];
 		
 		require('config.php');
 		
