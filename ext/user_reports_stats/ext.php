@@ -28,7 +28,7 @@ class ext extends \phpbb\extension\base  {
 				AFTER INSERT ON phpbb_reports
 				FOR EACH ROW
 			BEGIN
-				IF ( SELECT EXISTS(SELECT id FROM users_report_counts r
+				IF ( SELECT EXISTS(SELECT report_id FROM users_report_counts r
 									WHERE r.user_id = NEW.user_id) ) THEN
 					UPDATE users_report_counts r
 					SET r.reports_count = r.reports_count + 1
