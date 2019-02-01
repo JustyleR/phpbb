@@ -1,0 +1,28 @@
+{
+    "name": "justyler/user_reports_stats",
+    "type": "phpbb-extension",
+    "description": "Check the reports stats by users (deleted and closed)",
+    "homepage": "https://github.com/JustyleR/phpbb/ext/user_reports_stats",
+    "version": "0.0.1",
+    "time": "2019-01-30",
+    "keywords": ["justyler", "user", "reports", "stats"],
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "JustyleR",
+            "email": "justyler1@gmail.com",
+            "homepage": "https://github.com/JustyleR/",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "composer/installers": "~1.0"
+    },
+    "extra": {
+        "display-name": "User Reports Stats",
+        "soft-require": {
+            "phpbb/phpbb": "~3.2"
+        }
+    }
+}

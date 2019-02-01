@@ -1,0 +1,20 @@
+services:
+    justyler.user_reports_stats.foobar_collection:
+        class: phpbb\di\service_collection
+        arguments:
+            - '@dbal.conn'
+            
+        tags:
+            - { name: service_collection, tag: justyler.user_reports_stats.foobar_service }
+    
+    justyler.user_reports_stats.listener:
+        class: justyler\user_reports_stats\event\main_listener
+        arguments:
+            - '@dbal.conn'
+            - '@user'
+            - '@template'
+            - '@auth'
+            - '@request'
+            
+        tags:
+            - { name: event.listener }
